@@ -1,7 +1,7 @@
 use crate::sys::vpi as sys;
 use std::ptr;
 
-/// get current simulation time in _simulation time unit_
+/// Get current simulation time in _simulation time unit_
 pub fn get_time() -> u64 {
     let mut time = sys::s_vpi_time {
         type_: sys::vpiSimTime as i32,
