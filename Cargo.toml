@@ -13,3 +13,6 @@ license = "MIT OR Apache-2.0"
 [features]
 sv2023 = []
 vpi = []
+
+[package.metadata.docs.rs]
+features = ["sv2023", "vpi"]
