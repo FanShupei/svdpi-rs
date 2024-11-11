@@ -4,6 +4,81 @@ use std::{
     ptr::{self, NonNull},
 };
 
+pub mod param;
+
+/// See also [`sys::sv_0`]
+pub const SV_0: u8 = 0;
+/// See also [`sys::sv_1`]
+pub const SV_1: u8 = 1;
+/// See also [`sys::sv_z`]
+pub const SV_Z: u8 = 2;
+/// See also [`sys::sv_x`]
+pub const SV_X: u8 = 3;
+
+/// Data type reflecting four-value type in Verilog
+#[repr(u8)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+pub enum Logic {
+    /// logic zero
+    Value0 = SV_0,
+    /// logic one
+    Value1 = SV_1,
+    /// unknown logic value (X state)
+    Z = SV_Z,
+    /// high-impledance state (Z state)
+    X = SV_X,
+}
+
+impl Default for Logic {
+    fn default() -> Self {
+        Logic::Value0
+    }
+}
+
+impl From<Logic> for u8 {
+    fn from(value: Logic) -> Self {
+        value as u8
+    }
+}
+
+impl From<bool> for Logic {
+    fn from(value: bool) -> Self {
+        match value {
+            false => Logic::Value0,
+            true => Logic::Value1,
+        }
+    }
+}
+
+impl Logic {
+    /// interpret X and Z as None
+    pub fn into_bool(self) -> Option<bool> {
+        match self {
+            Logic::Value0 => Some(false),
+            Logic::Value1 => Some(true),
+            _ => None,
+        }
+    }
+
+    /// interpret None as X
+    pub fn from_bool_x(value: Option<bool>) -> Self {
+        match value {
+            Some(false) => Logic::Value0,
+            Some(true) => Logic::Value1,
+            None => Logic::X,
+        }
+    }
+
+    /// interpret None as Z
+    pub fn from_bool_z(value: Option<bool>) -> Self {
+        match value {
+            Some(false) => Logic::Value0,
+            Some(true) => Logic::Value1,
+            None => Logic::Z,
+        }
+    }
+}
+
 /// Get current simulation time in _simulation time unit_. See also [`sys::svGetTime`]
 ///
 /// # Panics
