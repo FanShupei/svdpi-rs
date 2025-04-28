@@ -8,7 +8,7 @@ pub mod vpi;
 /// Raw Bindings for C headers
 pub mod sys;
 
-pub use dpi::{set_scope, set_scope_by_name, SvScope};
+pub use dpi::{SvScope, set_scope, set_scope_by_name};
 
 /// Get current simulation time in _simulation time unit_.
 ///

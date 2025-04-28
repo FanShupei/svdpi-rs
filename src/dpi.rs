@@ -1,6 +1,6 @@
 use crate::sys::dpi as sys;
 use std::{
-    ffi::{c_char, c_void, CStr, CString},
+    ffi::{CStr, CString, c_char, c_void},
     ptr::{self, NonNull},
 };
 
@@ -17,9 +17,10 @@ pub const SV_X: u8 = 3;
 
 /// Data type reflecting four-value type in Verilog
 #[repr(u8)]
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub enum Logic {
     /// logic zero
+    #[default]
     Value0 = SV_0,
     /// logic one
     Value1 = SV_1,
@@ -27,12 +28,6 @@ pub enum Logic {
     Z = SV_Z,
     /// high-impledance state (Z state)
     X = SV_X,
-}
-
-impl Default for Logic {
-    fn default() -> Self {
-        Logic::Value0
-    }
 }
 
 impl From<Logic> for u8 {
@@ -87,7 +82,7 @@ impl Logic {
 #[cfg(feature = "sv2023")]
 pub fn get_time() -> u64 {
     let mut time = sys::svTimeVal {
-        type_: sys::sv_sim_time as i32,
+        type_: sys::sv_sim_time,
         high: 0,
         low: 0,
         real: 0.0,
@@ -159,7 +154,7 @@ impl SvScope {
     ///
     /// `name` shall be a valid pointer to a C-style string
     pub unsafe fn from_name_raw(name: *const c_char) -> Option<Self> {
-        Self::from_raw_optional(sys::svGetScopeFromName(name))
+        unsafe { Self::from_raw_optional(sys::svGetScopeFromName(name)) }
     }
 }
 
