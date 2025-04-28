@@ -197,3 +197,100 @@ impl RetStr {
         Self { inner: ptr }
     }
 }
+
+#[repr(transparent)]
+#[derive(Clone, Copy)]
+pub struct InBV<'a, const BITS: usize> {
+    inner: *const u32,
+    phantom: PhantomData<&'a [u32]>,
+}
+
+impl<'a, const BITS: usize> InBV<'a, BITS> {
+    const U32_LEN: usize = (BITS + 31) / 32;
+
+    #[cfg(target_endian = "little")]
+    const U8_LEN: usize = (BITS + 7) / 8;
+
+    pub fn as_ptr(&self) -> *const u32 {
+        self.inner
+    }
+
+    pub fn as_array<const LEN: usize>(&self) -> &'a [u32; LEN] {
+        assert_eq!(LEN, Self::U32_LEN);
+        unsafe { &*(self.inner as *const [u32; LEN]) }
+    }
+
+    #[cfg(target_endian = "little")]
+    pub fn as_u8_array<const LEN: usize>(&self) -> &'a [u8; LEN] {
+        assert_eq!(LEN, Self::U8_LEN);
+        unsafe { &*(self.inner as *const [u8; LEN]) }
+    }
+
+    pub fn as_slice(&self) -> &'a [u32] {
+        unsafe { std::slice::from_raw_parts(self.inner, Self::U32_LEN) }
+    }
+
+    #[cfg(target_endian = "little")]
+    pub fn as_u8_slice(&self) -> &'a [u8] {
+        unsafe { std::slice::from_raw_parts(self.inner as *const u8, Self::U8_LEN) }
+    }
+}
+
+#[repr(transparent)]
+pub struct OutBV<'a, const BITS: usize> {
+    inner: *mut u32,
+    phantom: PhantomData<&'a mut [u32]>,
+}
+
+impl<const BITS: usize> OutBV<'_, BITS> {
+    const U32_LEN: usize = (BITS + 31) / 32;
+
+    #[cfg(target_endian = "little")]
+    const U8_LEN: usize = (BITS + 7) / 8;
+
+    pub fn as_ptr(&self) -> *mut u32 {
+        self.inner
+    }
+
+    pub fn as_array<const LEN: usize>(&self) -> &[u32; LEN] {
+        assert_eq!(LEN, Self::U32_LEN);
+        unsafe { &*(self.inner as *const [u32; LEN]) }
+    }
+
+    pub fn as_array_mut<const LEN: usize>(&mut self) -> &mut [u32; LEN] {
+        assert_eq!(LEN, Self::U32_LEN);
+        unsafe { &mut *(self.inner as *mut [u32; LEN]) }
+    }
+
+    #[cfg(target_endian = "little")]
+    pub fn as_u8_array<const LEN: usize>(&self) -> &[u8; LEN] {
+        assert_eq!(LEN, Self::U8_LEN);
+        unsafe { &*(self.inner as *const [u8; LEN]) }
+    }
+
+    #[cfg(target_endian = "little")]
+    pub fn as_u8_array_mut<const LEN: usize>(&mut self) -> &mut [u8; LEN] {
+        assert_eq!(LEN, Self::U8_LEN);
+        unsafe { &mut *(self.inner as *mut [u8; LEN]) }
+    }
+
+    pub fn as_slice(&self) -> &[u32] {
+        unsafe { std::slice::from_raw_parts(self.inner, Self::U32_LEN) }
+    }
+
+    pub fn as_slice_mut(&mut self) -> &mut [u32] {
+        unsafe { std::slice::from_raw_parts_mut(self.inner, Self::U32_LEN) }
+    }
+
+    #[cfg(target_endian = "little")]
+    pub fn as_u8_slice(&self) -> &[u8] {
+        unsafe { std::slice::from_raw_parts(self.inner as *const u8, Self::U8_LEN) }
+    }
+
+    #[cfg(target_endian = "little")]
+    pub fn as_u8_slice_mut(&mut self) -> &mut [u8] {
+        unsafe { std::slice::from_raw_parts_mut(self.inner as *mut u8, Self::U8_LEN) }
+    }
+}
+
+pub type InoutBV<'a, const BITS: usize> = OutBV<'a, BITS>;

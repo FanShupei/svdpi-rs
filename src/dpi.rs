@@ -133,6 +133,16 @@ impl SvScope {
 }
 
 impl SvScope {
+    /// Get the fully qualified name of the scope handle.
+    ///
+    /// See also [`sys::svGetNameFromScope`]
+    pub fn name(self) -> &'static CStr {
+        unsafe {
+            let name = sys::svGetNameFromScope(self.ptr.as_ptr());
+            CStr::from_ptr(name)
+        }
+    }
+
     /// See also [`sys::svGetScopeFromName`]
     ///
     /// # Panics
