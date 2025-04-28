@@ -1,6 +1,6 @@
 [package]
 name = "svdpi"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2024"
 rust-version = "1.85"
 description = "Rust bindings for SystemVerilog DPI and VPI"
